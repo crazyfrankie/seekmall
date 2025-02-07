@@ -1,0 +1,83 @@
+syntax="proto3";
+
+package product;
+
+option go_package = "/product";
+
+import "idl/google/api/annotations.proto";
+
+message Product {
+  int32 id = 1;
+  string name = 2;
+  string description = 3;
+  string picture = 4;
+  float price = 5;
+  int32 uid = 6;
+  repeated string categories = 7;
+}
+
+message AddProductRequest {
+  string name = 1;
+  string description = 2;
+  string picture = 3;
+  float  price = 4;
+  int32 uid = 5;
+  repeated string categories = 6;
+}
+
+message AddProductResponse {
+
+}
+
+message ReleaseProductRequest {
+  int32 id = 1;
+}
+
+message ReleaseProductResponse {
+}
+
+message GetProductRequest {
+  int32 id = 1;
+}
+
+message GetProductResponse {
+  Product product = 1;
+}
+
+message SearchProductsRequest {
+  string query = 1;
+}
+
+message SearchProductsResponse {
+  repeated Product results = 1;
+}
+
+message ListProductsRequest{
+  int32 page = 1;
+  int32 pageSize = 2;
+  string categoryName = 3;
+}
+
+message ListProductsResponse{
+  repeated Product products = 1;
+}
+
+service ProductService {
+  rpc AddProduct(AddProductRequest) returns (AddProductResponse);
+  rpc ReleaseProduct(ReleaseProductRequest) returns (ReleaseProductResponse);
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse) {
+    option (google.api.http) = {
+      get: "/api/product"
+    };
+  }
+  rpc SearchProducts(SearchProductsRequest) returns (SearchProductsResponse) {
+    option (google.api.http) = {
+      get: "/api/product/query"
+    };
+  }
+  rpc ListProducts(ListProductsRequest) returns (ListProductsResponse) {
+    option (google.api.http) = {
+      get: "/api/product/list"
+    };
+  }
+}

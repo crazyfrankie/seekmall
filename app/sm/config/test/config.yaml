@@ -1,0 +1,14 @@
+server:
+  addr: ":8082"
+
+mysql:
+  dsn: "%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=true&loc=Local"
+
+redis:
+  addr: ":8836"
+
+jwt:
+  secret_key: "mY1eF3oI6mR7iR2yU0pW0rH1kA2qU1tQ"
+
+sms:
+  template_id: ""

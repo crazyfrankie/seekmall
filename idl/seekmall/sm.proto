@@ -1,0 +1,28 @@
+syntax="proto3";
+
+package sm;
+
+option go_package = "/sm";
+
+message SendSmsRequest {
+  string biz = 1;
+  string phone = 2;
+}
+
+message SendSmsResponse {
+}
+
+message VerifySmsRequest {
+  string biz = 1;
+  string code = 2;
+  string phone = 3;
+}
+
+message VerifySmsResponse {
+
+}
+
+service SmsService {
+  rpc SendSms(SendSmsRequest) returns (SendSmsResponse);
+  rpc VerifySms(VerifySmsRequest) returns (VerifySmsResponse);
+}
