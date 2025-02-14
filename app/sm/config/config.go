@@ -18,18 +18,14 @@ var (
 type Config struct {
 	Env    string
 	Server Server `yaml:"server"`
-	MySQL  MySQL  `yaml:"mysql"`
 	Redis  Redis  `yaml:"redis"`
 	JWT    JWT    `yaml:"jwt"`
 	SMS    SMS    `yaml:"sm"`
+	ETCD   ETCD   `yaml:"etcd"`
 }
 
 type Server struct {
 	Addr string `yaml:"addr"`
-}
-
-type MySQL struct {
-	DSN string `yaml:"dsn"`
 }
 
 type Redis struct {
@@ -42,6 +38,10 @@ type JWT struct {
 
 type SMS struct {
 	TemplateID string `yaml:"template_id"`
+}
+
+type ETCD struct {
+	Addr string `yaml:"addr"`
 }
 
 func GetConf() *Config {

@@ -10,28 +10,28 @@ import (
 	"fmt"
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository"
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository/dao"
-	"github.com/crazyfrankie/seekmall/app/user/biz/rpc"
 	"github.com/crazyfrankie/seekmall/app/user/biz/service"
 	"github.com/crazyfrankie/seekmall/app/user/config"
+	rpc2 "github.com/crazyfrankie/seekmall/app/user/rpc"
+	"go.etcd.io/etcd/client/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 	"os"
+	"time"
 )
 
 // Injectors from wire.go:
 
-func InitApp() *App {
+func InitServer() *rpc2.Server {
 	db := InitDB()
 	userDao := dao.NewUserDao(db)
 	userRepo := repository.NewUserRepo(userDao)
-	smsServiceClient := rpc.InitSmsClient()
+	client := InitRegistry()
+	smsServiceClient := rpc2.InitSmsClient(client)
 	userServer := service.NewUserServer(userRepo, smsServiceClient)
-	server := rpc.NewServer(userServer)
-	app := &App{
-		server: server,
-	}
-	return app
+	server := rpc2.NewServer(userServer, client)
+	return server
 }
 
 // wire.go:
@@ -53,6 +53,14 @@ func InitDB() *gorm.DB {
 	return db
 }
 
-type App struct {
-	server *rpc.Server
+func InitRegistry() *clientv3.Client {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{config.GetConf().ETCD.Addr},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return cli
 }

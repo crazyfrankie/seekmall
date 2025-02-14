@@ -4,16 +4,18 @@ package ioc
 
 import (
 	"fmt"
+	rpc2 "github.com/crazyfrankie/seekmall/app/user/rpc"
 	"os"
+	"time"
 
 	"github.com/google/wire"
+	clientv3 "go.etcd.io/etcd/client/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository"
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository/dao"
-	"github.com/crazyfrankie/seekmall/app/user/biz/rpc"
 	"github.com/crazyfrankie/seekmall/app/user/biz/service"
 	"github.com/crazyfrankie/seekmall/app/user/config"
 )
@@ -40,20 +42,27 @@ func InitDB() *gorm.DB {
 	return db
 }
 
-type App struct {
-	server *rpc.Server
+func InitRegistry() *clientv3.Client {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{config.GetConf().ETCD.Addr},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return cli
 }
 
-func InitApp() *App {
+func InitServer() *rpc2.Server {
 	wire.Build(
 		InitDB,
+		InitRegistry,
 		dao.NewUserDao,
 		repository.NewUserRepo,
 		service.NewUserServer,
-		rpc.InitSmsClient,
-		rpc.NewServer,
-
-		wire.Struct(new(App), "*"),
+		rpc2.InitSmsClient,
+		rpc2.NewServer,
 	)
-	return new(App)
+	return new(rpc2.Server)
 }

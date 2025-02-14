@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/crazyfrankie/seekmall/app/user/ioc"
 	"github.com/joho/godotenv"
+
+	"github.com/crazyfrankie/seekmall/app/user/ioc"
 )
 
 func main() {
@@ -11,6 +12,10 @@ func main() {
 		panic(err)
 	}
 
-	app := ioc.InitApp()
+	server := ioc.InitServer()
 
+	err = server.Serve()
+	if err != nil {
+		panic(err)
+	}
 }

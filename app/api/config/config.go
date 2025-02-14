@@ -19,6 +19,7 @@ type Config struct {
 	Env    string
 	Server Server `yaml:"server"`
 	JWT    JWT    `yaml:"jwt"`
+	ETCD   ETCD   `yaml:"etcd"`
 }
 
 type Server struct {
@@ -26,6 +27,10 @@ type Server struct {
 }
 type JWT struct {
 	SecretKey string `yaml:"secret_key"`
+}
+
+type ETCD struct {
+	Addr string `yaml:"addr"`
 }
 
 func GetConf() *Config {

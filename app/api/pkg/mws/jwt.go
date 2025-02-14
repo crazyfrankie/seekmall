@@ -12,7 +12,7 @@ import (
 )
 
 type Claims struct {
-	UId int
+	UId int32
 	jwt.MapClaims
 }
 

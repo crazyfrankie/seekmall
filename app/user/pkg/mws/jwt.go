@@ -13,11 +13,11 @@ import (
 )
 
 type Claims struct {
-	UId int
+	UId int32
 	jwt.MapClaims
 }
 
-func GenerateToken(uid int) (string, error) {
+func GenerateToken(uid int32) (string, error) {
 	now := time.Now()
 	claims := &Claims{
 		UId: uid,

@@ -1,15 +1,22 @@
 package ioc
 
 import (
+	"github.com/crazyfrankie/seekmall/rpc_gen/cart"
 	"github.com/crazyfrankie/seekmall/rpc_gen/product"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/crazyfrankie/seekmall/rpc_gen/sm"
 	"github.com/crazyfrankie/seekmall/rpc_gen/user"
 )
 
-func InitUserClient() user.UserServiceClient {
-	conn, err := grpc.NewClient("localhost:8081")
+func InitUserClient(cli *clientv3.Client) user.UserServiceClient {
+	builder, err := resolver.NewBuilder(cli)
+	conn, err := grpc.Dial("etcd:///service/user",
+		grpc.WithResolvers(builder),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -17,8 +24,11 @@ func InitUserClient() user.UserServiceClient {
 	return user.NewUserServiceClient(conn)
 }
 
-func InitSmsClient() sm.SmsServiceClient {
-	conn, err := grpc.NewClient("localhost:8082")
+func InitSmsClient(cli *clientv3.Client) sm.SmsServiceClient {
+	builder, err := resolver.NewBuilder(cli)
+	conn, err := grpc.Dial("etcd:///service/sms",
+		grpc.WithResolvers(builder),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -26,11 +36,26 @@ func InitSmsClient() sm.SmsServiceClient {
 	return sm.NewSmsServiceClient(conn)
 }
 
-func InitProductClient() product.ProductServiceClient {
-	conn, err := grpc.NewClient("localhost:8083")
+func InitProductClient(cli *clientv3.Client) product.ProductServiceClient {
+	builder, err := resolver.NewBuilder(cli)
+	conn, err := grpc.Dial("etcd:///service/product",
+		grpc.WithResolvers(builder),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 
 	return product.NewProductServiceClient(conn)
+}
+
+func InitCartClient(cli *clientv3.Client) cart.CartServiceClient {
+	builder, err := resolver.NewBuilder(cli)
+	conn, err := grpc.Dial("etcd:///service/cart",
+		grpc.WithResolvers(builder),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+
+	return cart.NewCartServiceClient(conn)
 }

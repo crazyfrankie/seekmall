@@ -2,10 +2,11 @@ package dao
 
 import (
 	"context"
-	"github.com/crazyfrankie/seekmall/app/pkg/constants"
 	"time"
 
 	"gorm.io/gorm"
+
+	"github.com/crazyfrankie/seekmall/app/product/pkg/constants"
 )
 
 type SellerDao struct {

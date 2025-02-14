@@ -78,7 +78,7 @@ func (s *UserServer) VerifyCode(ctx context.Context, req *user.VerifyCodeRequest
 	}
 
 	var token string
-	token, err = mws.GenerateToken(uid)
+	token, err = mws.GenerateToken(int32(uid))
 	if err != nil {
 		return nil, err
 	}

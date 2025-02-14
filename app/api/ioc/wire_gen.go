@@ -7,21 +7,27 @@
 package ioc
 
 import (
+	"github.com/crazyfrankie/seekmall/app/api/config"
 	"github.com/crazyfrankie/seekmall/app/api/handler"
 	"github.com/crazyfrankie/seekmall/app/api/pkg/mws"
 	"github.com/gin-gonic/gin"
+	"go.etcd.io/etcd/client/v3"
+	"time"
 )
 
 // Injectors from wire.go:
 
 func InitGin() *gin.Engine {
 	v := InitMws()
-	userServiceClient := InitUserClient()
-	smsServiceClient := InitSmsClient()
+	client := InitRegistry()
+	userServiceClient := InitUserClient(client)
+	smsServiceClient := InitSmsClient(client)
 	userHandler := handler.NewUserHandler(userServiceClient, smsServiceClient)
-	productServiceClient := InitProductClient()
+	productServiceClient := InitProductClient(client)
 	productHandler := handler.NewProductHandler(productServiceClient)
-	engine := InitWeb(v, userHandler, productHandler)
+	cartServiceClient := InitCartClient(client)
+	cartHandler := handler.NewCartHandler(cartServiceClient)
+	engine := InitWeb(v, userHandler, productHandler, cartHandler)
 	return engine
 }
 
@@ -35,12 +41,25 @@ func InitMws() []gin.HandlerFunc {
 	}
 }
 
-func InitWeb(mws2 []gin.HandlerFunc, user *handler.UserHandler, product *handler.ProductHandler) *gin.Engine {
+func InitWeb(mws2 []gin.HandlerFunc, user *handler.UserHandler, product *handler.ProductHandler, cart *handler.CartHandler) *gin.Engine {
 	server := gin.Default()
 	server.Use(mws2...)
 
 	user.RegisterRoute(server)
 	product.RegisterRoute(server)
+	cart.RegisterRoute(server)
 
 	return server
+}
+
+func InitRegistry() *clientv3.Client {
+	cli, err := clientv3.New(clientv3.Config{
+		Endpoints:   []string{config.GetConf().ETCD.Addr},
+		DialTimeout: 5 * time.Second,
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	return cli
 }
