@@ -19,7 +19,7 @@ type Payment struct {
 	TxnID  sql.NullString `gorm:"column:biz_trade_no;type:varchar(255);unique"`
 	Status int8
 	Ctime  int64
-	Utime  int64
+	Utime  int64 `gorm:"index"`
 }
 
 type PaymentDao struct {
@@ -46,4 +46,16 @@ func (d *PaymentDao) UpdatePaymentStatus(ctx context.Context, p *Payment) error 
 			"status": p.Status,
 			"utime":  time.Now().UnixMilli(),
 		}).Error
+}
+
+func (d *PaymentDao) FindExpirePayment(ctx context.Context, offset, limit int, time int64) ([]Payment, error) {
+	var pms []Payment
+	err := d.db.WithContext(ctx).Model(&Payment{}).
+		Where("status = ? AND utime < ?", 1, time).
+		Limit(limit).Offset(offset).Find(&pms).Error
+	if err != nil {
+		return []Payment{}, err
+	}
+
+	return pms, nil
 }

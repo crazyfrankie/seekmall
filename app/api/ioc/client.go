@@ -2,6 +2,7 @@ package ioc
 
 import (
 	"github.com/crazyfrankie/seekmall/rpc_gen/cart"
+	"github.com/crazyfrankie/seekmall/rpc_gen/payment"
 	"github.com/crazyfrankie/seekmall/rpc_gen/product"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"go.etcd.io/etcd/client/v3/naming/resolver"
@@ -58,4 +59,16 @@ func InitCartClient(cli *clientv3.Client) cart.CartServiceClient {
 	}
 
 	return cart.NewCartServiceClient(conn)
+}
+
+func InitPaymentClient(cli *clientv3.Client) payment.PaymentServiceClient {
+	builder, err := resolver.NewBuilder(cli)
+	conn, err := grpc.Dial("etcd:///service/payment",
+		grpc.WithResolvers(builder),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		panic(err)
+	}
+
+	return payment.NewPaymentServiceClient(conn)
 }

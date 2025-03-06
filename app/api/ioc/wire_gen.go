@@ -11,6 +11,7 @@ import (
 	"github.com/crazyfrankie/seekmall/app/api/handler"
 	"github.com/crazyfrankie/seekmall/app/api/pkg/mws"
 	"github.com/gin-gonic/gin"
+	"github.com/wechatpay-apiv3/wechatpay-go/core/notify"
 	"go.etcd.io/etcd/client/v3"
 	"time"
 )
@@ -27,7 +28,10 @@ func InitGin() *gin.Engine {
 	productHandler := handler.NewProductHandler(productServiceClient)
 	cartServiceClient := InitCartClient(client)
 	cartHandler := handler.NewCartHandler(cartServiceClient)
-	engine := InitWeb(v, userHandler, productHandler, cartHandler)
+	notifyHandler := InitNotify()
+	paymentServiceClient := InitPaymentClient(client)
+	paymentHandler := handler.NewPaymentHandler(notifyHandler, paymentServiceClient)
+	engine := InitWeb(v, userHandler, productHandler, cartHandler, paymentHandler)
 	return engine
 }
 
@@ -41,13 +45,15 @@ func InitMws() []gin.HandlerFunc {
 	}
 }
 
-func InitWeb(mws2 []gin.HandlerFunc, user *handler.UserHandler, product *handler.ProductHandler, cart *handler.CartHandler) *gin.Engine {
+func InitWeb(mws2 []gin.HandlerFunc, user *handler.UserHandler,
+	product *handler.ProductHandler, cart *handler.CartHandler, payment *handler.PaymentHandler) *gin.Engine {
 	server := gin.Default()
 	server.Use(mws2...)
 
 	user.RegisterRoute(server)
 	product.RegisterRoute(server)
 	cart.RegisterRoute(server)
+	payment.RegisterRoute(server)
 
 	return server
 }
@@ -62,4 +68,8 @@ func InitRegistry() *clientv3.Client {
 	}
 
 	return cli
+}
+
+func InitNotify() *notify.Handler {
+	return notify.NewEmptyHandler()
 }

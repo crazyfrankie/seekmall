@@ -19,8 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PaymentService_PrePay_FullMethodName         = "/payment.PaymentService/PrePay"
-	PaymentService_HandleCallBack_FullMethodName = "/payment.PaymentService/HandleCallBack"
+	PaymentService_PrePay_FullMethodName            = "/payment.PaymentService/PrePay"
+	PaymentService_HandleCallBack_FullMethodName    = "/payment.PaymentService/HandleCallBack"
+	PaymentService_FindExpirePayment_FullMethodName = "/payment.PaymentService/FindExpirePayment"
+	PaymentService_SyncWechatInfo_FullMethodName    = "/payment.PaymentService/SyncWechatInfo"
 )
 
 // PaymentServiceClient is the client API for PaymentService service.
@@ -29,6 +31,8 @@ const (
 type PaymentServiceClient interface {
 	PrePay(ctx context.Context, in *PrePayRequest, opts ...grpc.CallOption) (*PrePayResponse, error)
 	HandleCallBack(ctx context.Context, in *HandleCallBackRequest, opts ...grpc.CallOption) (*HandleCallBackResponse, error)
+	FindExpirePayment(ctx context.Context, in *FindExpirePaymentRequest, opts ...grpc.CallOption) (*FindExpirePaymentResponse, error)
+	SyncWechatInfo(ctx context.Context, in *SyncWechatInfoRequest, opts ...grpc.CallOption) (*SyncWechatInfoResponse, error)
 }
 
 type paymentServiceClient struct {
@@ -59,12 +63,34 @@ func (c *paymentServiceClient) HandleCallBack(ctx context.Context, in *HandleCal
 	return out, nil
 }
 
+func (c *paymentServiceClient) FindExpirePayment(ctx context.Context, in *FindExpirePaymentRequest, opts ...grpc.CallOption) (*FindExpirePaymentResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(FindExpirePaymentResponse)
+	err := c.cc.Invoke(ctx, PaymentService_FindExpirePayment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *paymentServiceClient) SyncWechatInfo(ctx context.Context, in *SyncWechatInfoRequest, opts ...grpc.CallOption) (*SyncWechatInfoResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SyncWechatInfoResponse)
+	err := c.cc.Invoke(ctx, PaymentService_SyncWechatInfo_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PaymentServiceServer is the server API for PaymentService service.
 // All implementations must embed UnimplementedPaymentServiceServer
 // for forward compatibility.
 type PaymentServiceServer interface {
 	PrePay(context.Context, *PrePayRequest) (*PrePayResponse, error)
 	HandleCallBack(context.Context, *HandleCallBackRequest) (*HandleCallBackResponse, error)
+	FindExpirePayment(context.Context, *FindExpirePaymentRequest) (*FindExpirePaymentResponse, error)
+	SyncWechatInfo(context.Context, *SyncWechatInfoRequest) (*SyncWechatInfoResponse, error)
 	mustEmbedUnimplementedPaymentServiceServer()
 }
 
@@ -80,6 +106,12 @@ func (UnimplementedPaymentServiceServer) PrePay(context.Context, *PrePayRequest)
 }
 func (UnimplementedPaymentServiceServer) HandleCallBack(context.Context, *HandleCallBackRequest) (*HandleCallBackResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HandleCallBack not implemented")
+}
+func (UnimplementedPaymentServiceServer) FindExpirePayment(context.Context, *FindExpirePaymentRequest) (*FindExpirePaymentResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method FindExpirePayment not implemented")
+}
+func (UnimplementedPaymentServiceServer) SyncWechatInfo(context.Context, *SyncWechatInfoRequest) (*SyncWechatInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SyncWechatInfo not implemented")
 }
 func (UnimplementedPaymentServiceServer) mustEmbedUnimplementedPaymentServiceServer() {}
 func (UnimplementedPaymentServiceServer) testEmbeddedByValue()                        {}
@@ -138,6 +170,42 @@ func _PaymentService_HandleCallBack_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PaymentService_FindExpirePayment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(FindExpirePaymentRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).FindExpirePayment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_FindExpirePayment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).FindExpirePayment(ctx, req.(*FindExpirePaymentRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _PaymentService_SyncWechatInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SyncWechatInfoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PaymentServiceServer).SyncWechatInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PaymentService_SyncWechatInfo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PaymentServiceServer).SyncWechatInfo(ctx, req.(*SyncWechatInfoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PaymentService_ServiceDesc is the grpc.ServiceDesc for PaymentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -152,6 +220,14 @@ var PaymentService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HandleCallBack",
 			Handler:    _PaymentService_HandleCallBack_Handler,
+		},
+		{
+			MethodName: "FindExpirePayment",
+			Handler:    _PaymentService_FindExpirePayment_Handler,
+		},
+		{
+			MethodName: "SyncWechatInfo",
+			Handler:    _PaymentService_SyncWechatInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

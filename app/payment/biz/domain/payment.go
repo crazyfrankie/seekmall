@@ -3,10 +3,11 @@ package domain
 type PaymentStatus int8
 
 const (
-	PaymentStatusRefund PaymentStatus = iota
+	PaymentStatusUnknown PaymentStatus = iota
 	PaymentStatusInit
 	PaymentStatusSuccess
 	PaymentStatusFailed
+	PaymentStatusRefund
 )
 
 func (p PaymentStatus) AsInt8() int8 {

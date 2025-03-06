@@ -3,21 +3,25 @@
 package ioc
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"time"
 
 	"github.com/google/wire"
+	"github.com/wechatpay-apiv3/wechatpay-go/core"
+	"github.com/wechatpay-apiv3/wechatpay-go/services/payments/native"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 
-	"github.com/crazyfrankie/seekmall/app/user/biz/repository"
-	"github.com/crazyfrankie/seekmall/app/user/biz/repository/dao"
-	"github.com/crazyfrankie/seekmall/app/user/biz/service"
-	"github.com/crazyfrankie/seekmall/app/user/config"
-	"github.com/crazyfrankie/seekmall/app/user/rpc"
+	"github.com/crazyfrankie/seekmall/app/payment/biz/repository"
+	"github.com/crazyfrankie/seekmall/app/payment/biz/repository/dao"
+	"github.com/crazyfrankie/seekmall/app/payment/biz/service"
+	"github.com/crazyfrankie/seekmall/app/payment/biz/service/wechat"
+	"github.com/crazyfrankie/seekmall/app/payment/config"
+	"github.com/crazyfrankie/seekmall/app/payment/rpc"
 )
 
 func InitDB() *gorm.DB {
@@ -37,7 +41,7 @@ func InitDB() *gorm.DB {
 		panic(err)
 	}
 
-	db.AutoMigrate(&dao.User{})
+	db.AutoMigrate(&dao.Payment{})
 
 	return db
 }
@@ -54,15 +58,28 @@ func InitRegistry() *clientv3.Client {
 	return cli
 }
 
+func InitNativeService() *native.NativeApiService {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	cli, err := core.NewClient(ctx)
+	if err != nil {
+		panic(err)
+	}
+
+	return &native.NativeApiService{Client: cli}
+}
+
 func InitServer() *rpc.Server {
 	wire.Build(
 		InitDB,
 		InitRegistry,
-		dao.NewUserDao,
-		repository.NewUserRepo,
-		service.NewUserServer,
-		rpc.InitSmsClient,
+		dao.NewPaymentDao,
+		repository.NewPaymentRepo,
+		InitNativeService,
+		wechat.NewNativePayService,
+		service.NewPaymentServer,
 		rpc.NewServer,
 	)
+
 	return new(rpc.Server)
 }

@@ -6,6 +6,7 @@ import (
 	"github.com/crazyfrankie/seekmall/app/api/config"
 	"github.com/gin-gonic/gin"
 	"github.com/google/wire"
+	"github.com/wechatpay-apiv3/wechatpay-go/core/notify"
 	clientv3 "go.etcd.io/etcd/client/v3"
 	"time"
 
@@ -22,13 +23,15 @@ func InitMws() []gin.HandlerFunc {
 	}
 }
 
-func InitWeb(mws []gin.HandlerFunc, user *handler.UserHandler, product *handler.ProductHandler, cart *handler.CartHandler) *gin.Engine {
+func InitWeb(mws []gin.HandlerFunc, user *handler.UserHandler,
+	product *handler.ProductHandler, cart *handler.CartHandler, payment *handler.PaymentHandler) *gin.Engine {
 	server := gin.Default()
 	server.Use(mws...)
 
 	user.RegisterRoute(server)
 	product.RegisterRoute(server)
 	cart.RegisterRoute(server)
+	payment.RegisterRoute(server)
 
 	return server
 }
@@ -45,16 +48,23 @@ func InitRegistry() *clientv3.Client {
 	return cli
 }
 
+func InitNotify() *notify.Handler {
+	return notify.NewEmptyHandler()
+}
+
 func InitGin() *gin.Engine {
 	wire.Build(
 		InitRegistry,
+		InitNotify,
 		InitUserClient,
 		InitSmsClient,
 		InitProductClient,
 		InitCartClient,
+		InitPaymentClient,
 		handler.NewUserHandler,
 		handler.NewProductHandler,
 		handler.NewCartHandler,
+		handler.NewPaymentHandler,
 		InitMws,
 		InitWeb,
 	)
