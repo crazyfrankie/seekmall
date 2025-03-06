@@ -11,18 +11,16 @@ import (
 )
 
 var (
-	once   sync.Once
-	config *Config
+	once sync.Once
+	conf *Config
 )
 
 type Config struct {
 	Env    string
 	Server Server `yaml:"server"`
 	MySQL  MySQL  `yaml:"mysql"`
-	JWT    JWT    `yaml:"jwt"`
-	SMS    SMS    `yaml:"sm"`
 	ETCD   ETCD   `yaml:"etcd"`
-	System System `yaml:"system"`
+	JWT    JWT    `yaml:"jwt"`
 }
 
 type Server struct {
@@ -33,32 +31,17 @@ type MySQL struct {
 	DSN string `yaml:"dsn"`
 }
 
-type JWT struct {
-	SecretKey string `yaml:"secret_key"`
-}
-
-type SMS struct {
-	TemplateID string `yaml:"template_id"`
-}
-
 type ETCD struct {
 	Addr string `yaml:"addr"`
 }
 
-type Minio struct {
-	EndPoint   string `yaml:"endPoint"`
-	AccessKey  string `yaml:"accessKey"`
-	SecretKey  string `yaml:"secretKey"`
-	BucketName string `yaml:"bucketName"`
-}
-
-type System struct {
-	DefaultAvatar string `yaml:"defaultAvatar"`
+type JWT struct {
+	SecretKey string `yaml:"secretKey"`
 }
 
 func GetConf() *Config {
 	once.Do(initConf)
-	return config
+	return conf
 }
 
 func initConf() {
@@ -70,13 +53,13 @@ func initConf() {
 		log.Fatalf("Failed to read config file: %v", err)
 	}
 
-	config = new(Config)
-	if err := viper.Unmarshal(config); err != nil {
+	conf = new(Config)
+	if err := viper.Unmarshal(conf); err != nil {
 		log.Fatalf("Failed to unmarshal config file: %v", err)
 	}
 
-	config.Env = getServerEnv()
-	fmt.Printf("%#v", config)
+	conf.Env = getServerEnv()
+	fmt.Printf("%#v", conf)
 }
 
 func getServerEnv() string {

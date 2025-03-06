@@ -3,12 +3,13 @@ package rpc
 import (
 	"context"
 	"fmt"
-	clientv3 "go.etcd.io/etcd/client/v3"
-	"go.etcd.io/etcd/client/v3/naming/endpoints"
-	"google.golang.org/grpc"
 	"log"
 	"net"
 	"time"
+
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/naming/endpoints"
+	"google.golang.org/grpc"
 
 	"github.com/crazyfrankie/seekmall/app/user/biz/service"
 	"github.com/crazyfrankie/seekmall/app/user/config"

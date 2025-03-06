@@ -11,6 +11,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.1
 	github.com/google/wire v0.6.0
 	github.com/spf13/viper v1.19.0
+	github.com/wechatpay-apiv3/wechatpay-go v0.2.20
 	go.etcd.io/etcd/client/v3 v3.5.12
 	google.golang.org/grpc v1.70.0
 )

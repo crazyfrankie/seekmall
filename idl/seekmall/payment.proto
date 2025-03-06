@@ -1,0 +1,33 @@
+syntax="proto3";
+
+package payment;
+
+option go_package = "/payment";
+
+message HandleCallBackRequest {
+  string biz_trade_no = 1;
+  string transaction_id = 2;
+  int32 status = 3;
+}
+
+message HandleCallBackResponse {
+
+}
+
+message PrePayRequest {
+  string app_id = 1;
+  string mch_id = 2;
+  string description = 3;
+  int64 total = 4;
+  string currency = 5;
+  int32 status= 6;
+}
+
+message PrePayResponse {
+  string code_url = 1;
+}
+
+service PaymentService {
+  rpc PrePay(PrePayRequest) returns (PrePayResponse);
+  rpc HandleCallBack(HandleCallBackRequest) returns (HandleCallBackResponse);
+}

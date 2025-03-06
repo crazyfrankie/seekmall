@@ -13,3 +13,7 @@ gen-product:
 .PHONY: gen-cart
 gen-cart:
 	@protoc --go_out=./rpc_gen --go-grpc_out=./rpc_gen --grpc-gateway_out=./rpc_gen ./idl/seekmall/cart.proto
+
+.PHONY: gen-payment
+gen-payment:
+	@protoc --go_out=./rpc_gen --go-grpc_out=./rpc_gen --grpc-gateway_out=./rpc_gen ./idl/seekmall/payment.proto

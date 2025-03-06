@@ -7,6 +7,7 @@ import (
 
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository"
 	"github.com/crazyfrankie/seekmall/app/user/biz/repository/dao"
+	"github.com/crazyfrankie/seekmall/app/user/config"
 	"github.com/crazyfrankie/seekmall/app/user/pkg/constants"
 	"github.com/crazyfrankie/seekmall/app/user/pkg/mws"
 	"github.com/crazyfrankie/seekmall/rpc_gen/sm"
@@ -70,6 +71,11 @@ func (s *UserServer) VerifyCode(ctx context.Context, req *user.VerifyCodeRequest
 			Phone: phone,
 			Name:  phone,
 		}
+		if config.GetConf().System.DefaultAvatar == constants.AvatarOSS {
+			u.Avatar = constants.DefaultAvatarOSS
+		} else {
+			u.Avatar = constants.DefaultAvatarLocal
+		}
 		err := s.repo.Create(ctx, u)
 		if err != nil {
 			return nil, err
@@ -77,6 +83,11 @@ func (s *UserServer) VerifyCode(ctx context.Context, req *user.VerifyCodeRequest
 		uid = u.Id
 	}
 
+	u, err := s.repo.FindByPhone(ctx, phone)
+	if err != nil {
+		return nil, err
+	}
+	uid = u.Id
 	var token string
 	token, err = mws.GenerateToken(int32(uid))
 	if err != nil {
@@ -94,9 +105,10 @@ func (s *UserServer) GetUserInfo(ctx context.Context, req *user.GetUserInfoReque
 
 	return &user.GetUserInfoResponse{
 		User: &user.User{
-			Id:    int32(u.Id),
-			Name:  u.Name,
-			Phone: u.Phone,
+			Id:     int32(u.Id),
+			Name:   u.Name,
+			Phone:  u.Phone,
+			Avatar: u.Avatar,
 		},
 	}, nil
 }

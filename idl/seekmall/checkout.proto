@@ -1,0 +1,19 @@
+syntax="proto3";
+
+package checkout;
+
+option go_package = "/checkout";
+
+message CheckoutRequest {
+  int32 user_id = 1;
+
+}
+
+message CheckoutResponse {
+
+}
+
+service CheckoutService {
+  rpc Checkout(CheckoutRequest) returns (CheckoutResponse);
+}
+

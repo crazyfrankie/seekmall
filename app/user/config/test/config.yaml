@@ -12,3 +12,12 @@ etcd:
 
 sms:
   template_id: ""
+
+system:
+  defaultAvatar: "oss"
+
+minio:
+  endpoint: "localhost:9000"
+  accessKey: "GXNPYQpuzY7CK4EmEkye"
+  secretKey: "bso9dpB32wuWAOOMsTnezScTqYTvqV6qXHttJTIS"
+  bucketName: "cloudstoragebucket"

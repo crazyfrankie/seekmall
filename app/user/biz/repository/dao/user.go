@@ -8,11 +8,12 @@ import (
 )
 
 type User struct {
-	Id    int    `gorm:"primaryKey,autoIncrement"`
-	Phone string `gorm:"unique"`
-	Name  string
-	Ctime int64
-	Utime int64
+	Id     int    `gorm:"primaryKey,autoIncrement"`
+	Phone  string `gorm:"unique"`
+	Name   string
+	Avatar string
+	Ctime  int64
+	Utime  int64
 }
 
 type UserDao struct {
